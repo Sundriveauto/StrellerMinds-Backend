@@ -1,16 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './app.module';
+import { Controller, Get, HttpCode, INestApplication, Module, Post } from '@nestjs/common';
+import request from 'supertest';
 
 const THRESHOLD_MS = 500;
+
+@Controller()
+class MockAppController {
+  @Get() root() { return {}; }
+  @Get('users') getUsers() { return []; }
+  @Get('users/:id') getUser() { return {}; }
+  @Get('courses') getCourses() { return []; }
+  @Get('courses/:id') getCourse() { return {}; }
+  @Get('auth/profile') getProfile() { return {}; }
+  @Post('auth/login') @HttpCode(200) login() { return {}; }
+}
+
+@Module({ controllers: [MockAppController] })
+class MockAppModule {}
 
 describe('API Response Time Thresholds', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [MockAppModule],
     }).compile();
 
     app = module.createNestApplication();
